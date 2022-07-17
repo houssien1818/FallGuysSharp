@@ -14,7 +14,11 @@ namespace FallGuysSharp
     {
         static void Main(string[] args)
         {
-            var monoInjector = new Injector("FallGuys_client");
+            var managedDlls = Directory.GetFiles("Managed");
+            foreach (var managedDll in managedDlls)
+                if (!File.Exists(Path.GetFileName(managedDll)))
+                    File.Copy(managedDll, Path.GetFileName(managedDll));
+            Injector monoInjector = new Injector("FallGuys_client");
 
             var dll = AssemblyDefinition.ReadAssembly("FallGuysMods.dll");
             var rand = Guid.NewGuid().ToString().Replace("-", "");
@@ -28,6 +32,7 @@ namespace FallGuysSharp
                 dllBytes = newDll.ToArray();
             }
             monoInjector.Inject(dllBytes, dll.Name.Name, "Init", "Setup");
+            Environment.Exit(0);
         }
     }
 }
